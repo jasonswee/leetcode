@@ -15,45 +15,34 @@
 #0 <= height[i] <= 105
 
 class Solution:
-    def get_occupied(self, row: list[int]) -> int:
-        first_ref=row[0]
-        sum=0
-        total=0
-        for x in row[1:]:
-            if first_ref == 0:
-                if x==1:
-                    first_ref =1
-                sum=0
-            elif first_ref == 1:
-                if x == 0:
-                    sum+=1
-                elif x == 1:
-                    total+=sum
-                    sum=0
-        #print("total: ", total)
-        return total
     def trap(self, height: list[int]) -> int:
-        max_row=max(height)
-        max_col=len(height)
-        #print("Max row: ",max_row," Max col: ", max_col)
-
-        plot=[]
-        #print(plot)
-        mod_h = height
-        for row in range(max_row):
-            roww=[]
-            for col in range(max_col):
-                if mod_h[col]>0:
-                    roww.append(1)
-                    mod_h[col]-=1
-                else:
-                    roww.append(0)
-            plot.append(roww)
-        #print(plot)
+        first_ref=height[0]
+        bott_ref=0
+        container=[0]*max(height)
         total=0
-        for x in plot:
-            #print(x)
-            total+=self.get_occupied(x)
+        for new_val in height[1:]:
+            if first_ref == 0:
+                first_ref = new_val
+                bott_ref = first_ref
+                continue
+            elif first_ref>0:
+                if new_val < first_ref:
+                    for x in range(new_val,first_ref):
+                        container[x]+=1
+
+                    if new_val > bott_ref:
+                        # check if at this level container is filled
+                        for x in range(bott_ref, new_val):
+                            if container[x] >= 1:
+                                total+=container[x]
+                                container[x]=0
+                    bott_ref = new_val
+
+                elif new_val >= first_ref:
+                    first_ref = new_val
+                    bott_ref = first_ref
+                    total+=sum(container)
+                    container=[0]*max(height)
         return total
 def test_solution():
     A=Solution()
@@ -63,5 +52,6 @@ def test_solution():
     height = [4,2,0,3,2,5]
     #print("input: ", height)
     assert A.trap(height) == 9
-
+    height =[0,7,1,4,6]
+    assert A.trap(height) == 7
 test_solution()
